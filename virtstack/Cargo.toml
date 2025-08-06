@@ -13,7 +13,7 @@ categories = ["development-tools::debugging", "rust-patterns"]
 authors = ["Patrick Wadström <patrick@wadtech.se>"]
 
 [dependencies]
-snafu-virtstack-macro = { path = "../virtstack_macro" }
+snafu-virtstack-macro = { version = "0.1.0", path = "../virtstack_macro" }
 
 [dev-dependencies]
 serde_json = "1.0.142"
