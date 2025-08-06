@@ -14,3 +14,7 @@ authors = ["Patrick Wadström <patrick@wadtech.se>"]
 
 [dependencies]
 snafu-virtstack-macro = { path = "../virtstack_macro" }
+
+[dev-dependencies]
+serde_json = "1.0.142"
+snafu = "0.8.6"

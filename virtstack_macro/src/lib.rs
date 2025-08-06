@@ -7,94 +7,11 @@ use syn::{Data, DeriveInput, parse_macro_input};
 /// This attribute automatically implements the [`VirtualStackTrace`] trait and provides
 /// a custom [`Debug`] implementation that displays a formatted virtual stack trace.
 ///
-/// The macro captures precise location information using Rust's `#[track_caller]`
-/// and walks the error source chain to build a complete error context without
-/// the overhead of system backtraces.
-///
-/// # Features
-///
-/// - **Automatic Implementation**: No need to manually implement virtual stack trace logic
-/// - **Location Tracking**: Captures file, line, and column information automatically
-/// - **Error Chain Walking**: Traverses the complete error source chain
-/// - **Zero-Cost Abstraction**: Stack frames are only generated when needed
-/// - **Custom Debug Output**: Provides formatted stack traces in debug output
-///
-/// # Usage
-///
-/// Simply add the `#[stack_trace_debug]` attribute to your SNAFU error enum:
-///
-/// ```rust
-/// use snafu::{Snafu, ResultExt};
-/// use snafu_virtstack::stack_trace_debug;
-///
-/// #[derive(Snafu)]
-/// #[stack_trace_debug]  // Add this attribute
-/// enum MyError {
-///     #[snafu(display("Failed to read file: {filename}"))]
-///     FileRead { filename: String, source: std::io::Error },
-///     
-///     #[snafu(display("Invalid data format"))]
-///     InvalidFormat { source: serde_json::Error },
-/// }
-///
-/// fn process_file(filename: &str) -> Result<String, MyError> {
-///     let content = std::fs::read_to_string(filename)
-///         .context(FileReadSnafu { filename })?;
-///     
-///     let data: serde_json::Value = serde_json::from_str(&content)
-///         .context(InvalidFormatSnafu)?;
-///     
-///     Ok(data.to_string())
-/// }
-/// ```
-///
-/// # Generated Debug Output
-///
-/// When an error occurs, the generated [`Debug`] implementation will display:
-///
-/// ```text
-/// Error: Failed to read file: config.json
-/// Virtual Stack Trace:
-///   0: Failed to read file: config.json at src/main.rs:15:23
-///   1: No such file or directory (os error 2) at src/main.rs:16:10
-/// ```
-///
-/// # Advanced Usage
-///
-/// You can also access the virtual stack programmatically:
-///
-/// ```rust
-/// use snafu_virtstack::VirtualStackTrace;
-/// # use snafu::{Snafu, ResultExt};
-/// # use snafu_virtstack::stack_trace_debug;
-/// # #[derive(Snafu)]
-/// # #[stack_trace_debug]
-/// # enum MyError {
-/// #     #[snafu(display("Something went wrong"))]
-/// #     SomethingWrong,
-/// # }
-///
-/// let error = MyError::SomethingWrong;
-/// let stack = error.virtual_stack();
-///
-/// for (i, frame) in stack.iter().enumerate() {
-///     println!("Frame {}: {} at {}:{}",
-///         i,
-///         frame.message,
-///         frame.location.file(),
-///         frame.location.line()
-///     );
-/// }
-/// ```
-///
-/// # Requirements
-///
-/// - Must be applied to `enum` types only
-/// - The enum should derive [`Snafu`] for full functionality
-/// - Works best with error enums that have source fields for error chaining
+/// See the main [`snafu_virtstack`] crate documentation for comprehensive usage examples
+/// and detailed information about virtual stack traces.
 ///
 /// [`VirtualStackTrace`]: snafu_virtstack::VirtualStackTrace
-/// [`Snafu`]: snafu::Snafu
+/// [`snafu_virtstack`]: https://docs.rs/snafu_virtstack
 #[proc_macro_attribute]
 pub fn stack_trace_debug(_args: TokenStream, input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);

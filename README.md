@@ -79,7 +79,7 @@ Virtual stack traces capture:
 ### Basic Example
 
 ```rust
-use snafu::{Snafu, ResultExt};
+use snafu::prelude::*;
 use snafu_virtstack::stack_trace_debug;
 
 #[derive(Snafu)]
@@ -125,7 +125,7 @@ fn read_config() -> Result<Config, AppError> {
 ### Advanced Example
 
 ```rust
-use snafu::{ensure, Snafu, ResultExt};
+use snafu::prelude::*;
 use snafu_virtstack::{stack_trace_debug, VirtualStackTrace};
 
 #[derive(Snafu)]
@@ -220,7 +220,7 @@ async fn handle_request(service: &UserService, id: u64) {
 When working with errors that need to be boxed (e.g., when using `Box<dyn std::error::Error + Send + Sync>`), you can use the `.boxed()` method to convert errors before applying context:
 
 ```rust
-use snafu::{Snafu, ResultExt};
+use snafu::prelude::*;
 use snafu_virtstack::stack_trace_debug;
 
 #[derive(Snafu)]
@@ -228,7 +228,7 @@ use snafu_virtstack::stack_trace_debug;
 pub enum MyError {
     #[snafu(display("Filesystem IO issue: {source}"))]
     FilesystemIoFailure { source: Box<dyn std::error::Error + Send + Sync> },
-    
+
     #[snafu(display("Configuration error: {source}"))]
     ConfigurationError { source: Box<dyn std::error::Error + Send + Sync> },
 }

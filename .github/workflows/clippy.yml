@@ -41,3 +41,6 @@ jobs:
     
     - name: Run Clippy
       run: cargo clippy --workspace --all-targets --all-features -- -D warnings
+    
+    - name: Run Tests
+      run: cargo test --workspace

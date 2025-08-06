@@ -24,33 +24,77 @@
 //!
 //! ## Basic Usage
 //!
+//! Simply add the `#[stack_trace_debug]` attribute to your SNAFU error enum:
+//!
 //! ```rust
-//! use snafu::{Snafu, ResultExt};
+//! use snafu::prelude::*;
 //! use snafu_virtstack::stack_trace_debug;
 //!
 //! #[derive(Snafu)]
-//! #[stack_trace_debug]
-//! pub enum AppError {
-//!     #[snafu(display("Failed to read configuration file"))]
-//!     ConfigRead { source: std::io::Error },
-//!
-//!     #[snafu(display("Invalid configuration format"))]
-//!     ConfigParse { source: serde_json::Error },
+//! #[stack_trace_debug]  // Add this attribute
+//! enum MyError {
+//!     #[snafu(display("Failed to read file: {filename}"))]
+//!     FileRead { filename: String, source: std::io::Error },
+//!     
+//!     #[snafu(display("Invalid data format"))]
+//!     InvalidFormat { source: serde_json::Error },
 //! }
 //!
-//! fn read_config() -> Result<String, AppError> {
-//!     let content = std::fs::read_to_string("config.json")
-//!         .context(ConfigReadSnafu)?;
+//! fn process_file(filename: &str) -> Result<String, MyError> {
+//!     let content = std::fs::read_to_string(filename)
+//!         .context(FileReadSnafu { filename })?;
 //!     
-//!     // When an error occurs, you get a detailed virtual stack trace:
-//!     // Error: Failed to read configuration file
-//!     // Virtual Stack Trace:
-//!     //   0: Failed to read configuration file at src/main.rs:45:10
-//!     //   1: No such file or directory (os error 2) at src/main.rs:46:15
+//!     let data: serde_json::Value = serde_json::from_str(&content)
+//!         .context(InvalidFormatSnafu)?;
 //!     
-//!     Ok(content)
+//!     Ok(data.to_string())
 //! }
 //! ```
+//!
+//! ## Generated Debug Output
+//!
+//! When an error occurs, the generated [`Debug`] implementation will display:
+//!
+//! ```text
+//! Error: Failed to read file: config.json
+//! Virtual Stack Trace:
+//!   0: Failed to read file: config.json at src/main.rs:15:23
+//!   1: No such file or directory (os error 2) at src/main.rs:16:10
+//! ```
+//!
+//! ## Advanced Usage
+//!
+//! You can also access the virtual stack programmatically:
+//!
+//! ```rust
+//! use snafu_virtstack::VirtualStackTrace;
+//! # use snafu::prelude::*;
+//! # use snafu_virtstack::stack_trace_debug;
+//! # #[derive(Snafu)]
+//! # #[stack_trace_debug]
+//! # enum MyError {
+//! #     #[snafu(display("Something went wrong"))]
+//! #     SomethingWrong,
+//! # }
+//!
+//! let error = MyError::SomethingWrong;
+//! let stack = error.virtual_stack();
+//!
+//! for (i, frame) in stack.iter().enumerate() {
+//!     println!("Frame {}: {} at {}:{}",
+//!         i,
+//!         frame.message,
+//!         frame.location.file(),
+//!         frame.location.line()
+//!     );
+//! }
+//! ```
+//!
+//! ## Requirements
+//!
+//! - Must be applied to `enum` types only
+//! - The enum should derive [`Snafu`] for full functionality
+//! - Works best with error enums that have source fields for error chaining
 //!
 //! ## Performance Benefits
 //!
@@ -100,7 +144,7 @@ pub use snafu_virtstack_macro::stack_trace_debug;
 /// # Example
 ///
 /// ```rust
-/// use snafu::Snafu;
+/// use snafu::prelude::*;
 /// use snafu_virtstack::{stack_trace_debug, VirtualStackTrace};
 ///
 /// #[derive(Snafu)]
