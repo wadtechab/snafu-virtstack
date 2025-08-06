@@ -215,6 +215,45 @@ async fn handle_request(service: &UserService, id: u64) {
 }
 ```
 
+### Boxing Errors
+
+When working with errors that need to be boxed (e.g., when using `Box<dyn std::error::Error + Send + Sync>`), you can use the `.boxed()` method to convert errors before applying context:
+
+```rust
+use snafu::{Snafu, ResultExt};
+use snafu_virtstack::stack_trace_debug;
+
+#[derive(Snafu)]
+#[stack_trace_debug]
+pub enum MyError {
+    #[snafu(display("Filesystem IO issue: {source}"))]
+    FilesystemIoFailure { source: Box<dyn std::error::Error + Send + Sync> },
+    
+    #[snafu(display("Configuration error: {source}"))]
+    ConfigurationError { source: Box<dyn std::error::Error + Send + Sync> },
+}
+
+fn read_config() -> Result<String, MyError> {
+    // Box the error before applying context
+    let content = std::fs::read_to_string("config.toml")
+        .boxed()
+        .context(FilesystemIoFailureSnafu)?;
+    
+    // Parse with another boxed error
+    let parsed: Config = toml::from_str(&content)
+        .boxed()
+        .context(ConfigurationErrorSnafu)?;
+    
+    Ok(format!("{:?}", parsed))
+}
+```
+
+The `.boxed()` method is particularly useful when:
+- You need to erase the specific error type
+- Working with trait objects that require `Send + Sync`
+- Dealing with multiple error types that need to be unified
+- Creating library APIs that don't want to expose implementation details
+
 ## Do's and Don'ts
 
 ### ✅ Do's
