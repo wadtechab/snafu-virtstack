@@ -1,0 +1,22 @@
+[package]
+name = "snafu-virtstack-macro"
+version = "0.1.0"
+edition = "2024"
+description = "Proc macro for snafu-virtstack providing automatic virtual stack trace implementation"
+license = "Apache-2.0"
+repository = "https://github.com/wadtech/snafu-virtstack"
+homepage = "https://github.com/wadtech/snafu-virtstack"
+documentation = "https://docs.rs/snafu-virtstack-macro"
+readme = "../README.md"
+keywords = ["error", "snafu", "macro", "proc-macro", "debugging"]
+categories = ["development-tools::debugging", "development-tools::procedural-macro-helpers"]
+authors = ["Patrick Wadström <patrick@wadtech.se>"]
+
+[lib]
+proc-macro = true
+
+[dependencies]
+proc-macro2 = "1.0"
+quote = "1.0"
+syn = { version = "2.0", features = ["full"] }
+snafu = "0.8"

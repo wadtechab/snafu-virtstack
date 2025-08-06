@@ -1,0 +1,16 @@
+[package]
+name = "snafu-virtstack"
+version = "0.1.0"
+edition = "2024"
+description = "A lightweight, efficient error handling library for Rust that implements virtual stack traces based on GreptimeDB's error handling approach"
+license = "Apache-2.0"
+repository = "https://github.com/wadtech/snafu-virtstack"
+homepage = "https://github.com/wadtech/snafu-virtstack"
+documentation = "https://docs.rs/snafu-virtstack"
+readme = "../README.md"
+keywords = ["error", "snafu", "backtrace", "stack-trace", "debugging"]
+categories = ["development-tools::debugging", "rust-patterns"]
+authors = ["Patrick Wadström <patrick@wadtech.se>"]
+
+[dependencies]
+snafu-virtstack-macro = { path = "../virtstack_macro" }
